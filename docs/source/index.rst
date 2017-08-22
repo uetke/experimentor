@@ -12,7 +12,7 @@ Installing
 
 The code of this program is the repository that can be found at ``https://github.com/uetke/experimentor``. You may also check the website ``https://uetke.com`` for some updates and comments that may not enter into this documentation.
 
-If you need further assistance with the installation of the code, please check :ref:`installing`
+If you need further assistance with the installation of the code, please refer to :ref:`installing`
 
 
 .. toctree::
