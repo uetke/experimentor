@@ -132,3 +132,5 @@ Finally, we have to do something when the experiment finishes, in our case we on
        shutter: False
 
 The overall structure of the yaml file may look a bit more involved than needed by simple experiments; for example we explicitly state which laser we use, while we could have hard coded this (there is only one laser plugged into the experiment). However keeping a more flexible approach enables users to re utilize code more easily. Scanning a laser today may be scanning a stepper motor tomorrow.
+
+Now that we have all the foundations to perform our experiment, is time to start feeding the information to different python packages.
