@@ -65,7 +65,19 @@ We start a new method and grabbed the properties of our scan::
         laser_params = self.scan['laser']['params']
         laser = self.devices[self.scan['laser']['name']]['dev']
         laser.apply_values(laser_params)
-        num_points = 1+int(
+
+First, we are going to setup the laser. For it, we load the parameters stored in scan['laser']['params']. You can always refer to the yaml file to see what they are, add new ones if you realize something is missing, etc. Then we load the Device that corresponds to the laser, and hence why the last ['dev'] in the call. When we do `laser.apply_values`, we are actually using a method that belongs to the Device object. Bear in mind that `laser_params` is a dictionary, with 'property'=>'value' as a structure.
+
+Bottom line is that you can pass a bunch of properties to a driver, provided that you do it through a dictionary. For example, you could have a dictionary like this::
+
+   prop = {
+      'wavelength': '1500nm',
+      'power': '200mW',
+   }
+
+After setting the laser to what we need, we have to prepare our acquisition card. If we are dealing with National Instruments cards, a lot of different properties have to be set before reading from a channel. So, let's start step by step, specially because afterwards we will have to digg into the NI model class to understand what is happening. First, we need to define the number of points and the temporal accuracy of our measurement::
+
+   num_points = 1+int(
         (laser.params['stop_wavelength'] - laser.params['start_wavelength']) / laser.params['interval_trigger'])
 
         # Estimated accuracy to set the DAQmx to.
@@ -77,12 +89,4 @@ We start a new method and grabbed the properties of our scan::
             'points': num_points
         }
 
-First, we are going to setup the laser. For it, we load the parameters stored in scan['laser']['params']. You can always refer to the yaml file to see what they are, add new ones if you realize something is missing, etc. Then we load the Device that corresponds to the laser, and hence why the last ['dev'] in the call. When we do `laser.apply_values`, we are actually using a method that belongs to the Device object. Bear in mind that `laser_params` is a dictionary, with 'property'=>'value' as a structure.
-
-Bottom line is that you can pass a bunch of properties to a driver, provided that you do it through a dictionary. For example, you could have a dictionary like this::
-
-   prop = {
-      'wavelength': '1500nm',
-      'power': '200mW',
-   }
-
+Remember that in this experiment, the ADQ is triggered by a signal coming from the laser. Therefore we can be sure of the number of points we are going to acquire per scan. The accuracy is just how much time there is between points. If the scan speed is constant, the time between acquisition points is given by distance/speed. In the case of triggering the digitalization from an external source, according to NI this parameter is not crucial but should be there anyhow.

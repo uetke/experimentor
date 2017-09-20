@@ -51,9 +51,6 @@ class Experiment(object):
                                      'actuators': {},
                                      'sensors': {}}
                 self.logger.debug('Added {} to the experiment'.format(dev))
-                if 'driver' in devices_dict[dev]:
-                    self.devices[dev]['dev'].initialize_driver()
-
             else:
                 self.logger.warning('Trying to load {}, but already exists'.format(dev))
                 raise Warning('Loading a duplicated device')
@@ -131,7 +128,7 @@ class Experiment(object):
             raise Exception('Devices have to be loaded before being initialized.')
 
         for dev in self.devices:
-            d = self.devices[dev]['dev'] # This is the Device instance
+            d = self.devices[dev]['dev']  # This is the Device instance
             d.initialize_driver()
 
     def initalize(self):
