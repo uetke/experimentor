@@ -8,3 +8,9 @@ Installing
 ----------
 
 The code of this program is the repository that can be found at ``https://github.com/uetke/experimentor``. You may also check the website ``https://uetke.com`` for some updates and comments that may not enter into this documentation.
+
+Documentation
+-------------
+The documentation of the program can be built with Sphinx and it can also be found at 
+
+http://documents.uetke.com/Experimentor/
