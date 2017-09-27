@@ -4,7 +4,23 @@
     ==========
     Class for controlling the Pharos setup. Everything revolves around triggering the scan of a laser and acquiring
     signals of different devices via an NI-DAQ card.
-    Ultimately it should also be able to change values of serial devices.
+    It is also able to perform 2D scans; the laser does a wavelength scan, then a device changes its position, and the
+    process is repeated.
+
+    First, a dictionary is passed as an argument; then, the main keys are stored as attributes of the class itself. See
+    the lines in the base experiment class that read::
+        for d in measure:
+            setattr(self, d, measure[d])
+
+    The loading and initialization of the devices happens by default. Several methods guide the step-by-step process
+    for performing an experiment.
+
+    - `setup_scan` prepares the laser and the ADQ for the measurement, but it doesn't trigger it.
+    - `do_scan` actually is responsible for performing the 2D scan.
+
+    .. todo:: The class does not leverage the capabilities of Qt for threading and emitting signals
+    .. todo:: data is read but not stored within the class; maybe it should be better to have it built-in
+    .. todo:: There is no method for saving; it was introduced in the GUI. Maibe it would make it a bit more robust.
 
 """
 import numpy as np
@@ -37,7 +53,7 @@ class LaserScan(Experiment):
         self.initialize_devices()
         self.daqs = {}  # Pace to store the DAQ devices that will be acquiring data
 
-    def setup_scan(self):
+        def setup_scan(self):
         """ Prepares the scan by setting all the parameters to the DAQs and laser.
 
         .. warning:: ALL THIS IS WORK IN PROGRESS, THAT WORKS WITH VERY SPECIFIC SETUP CONDITIONS!
@@ -248,7 +264,7 @@ class LaserScan(Experiment):
         :param devs: Devices to read from
         :type devs: list
         """
-        conditions = {'points': -1}  # To read all daqthe points available
+        conditions = {'points': -1}  # To read all the daq points available
         data = {}
         for d in devs:
             daq = self.daqs[d]
