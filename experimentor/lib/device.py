@@ -9,7 +9,7 @@
 
     .. warning::
 
-        If problems arise when adding new devices, tt is important to check :meth:initialize_driver .
+        If problems arise when adding new devices, it is important to check :meth:`initialize_driver`.
         It was hardcoded which parameters are passed when initializing each device type.
 
     .. todo::

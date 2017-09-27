@@ -3,17 +3,17 @@
     actuator.py
     ===========
     Actuators are all the devices able to modify the experiment. For example a piezo stage is an actuator.
-    The properties of the actuators are read-only; in principle one cannot change the port at which a specific sensor is plugged
-    without re-generating the object.
-    The actuator has a property called value, that can be accessed directly like so:
-        ```python
+    The properties of the actuators are read-only; in principle one cannot change the port at which a specific sensor
+    is plugged without re-generating the object.
+    The actuator has a property called value, that can be accessed directly like so::
+
         prop = {'name': 'Actuator 1'}
         a = Actuator(prop)
         a.value = Q_('1nm')
         print(a.value)
-        ```
-    Bear in mind that setting the value of an actuator triggers a communication with a real device. You have to be careful if
-    there is something connected to it.
+
+    Bear in mind that setting the value of an actuator triggers a communication with a real device. You have to be
+     careful if there is something connected to it.
 
     .. sectionauthor:: Aquiles Carattino <aquiles@uetke.com>
 """

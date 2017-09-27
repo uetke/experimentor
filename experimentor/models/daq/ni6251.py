@@ -47,6 +47,7 @@ class NI(Daq):
 
         :param actuator: specifies the actuator on which to act.
         :param value: The value to be set
+
         """
 
 

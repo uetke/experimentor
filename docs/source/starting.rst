@@ -11,10 +11,10 @@ Experimentor defines only general classes and methods that enable the user to de
 
 The steps needed to make an experiment using the Experimentor are as follow:
 
-   First one has to define which devices are going to be used and make a YAML file for them.
-   Then, the steps of the experiment are layed out in another YAML file.
-   A class based on Experimentor is written, with methods for every step layed out in the YAML file.
-   In principle a GUI can be built to modify the parameters passed to the experimentor class.
+   - First one has to define which devices are going to be used and make a YAML file for them.
+   - Then, the steps of the experiment are layed out in another YAML file.
+   - A class based on Experimentor is written, with methods for every step layed out in the YAML file.
+   - In principle a GUI can be built to modify the parameters passed to the experimentor class.
 
 Each step is thought in order to force the user to be in control of his/her experiment and not to rely on preconceived concepts that can be far from how the setup actually works.
 
