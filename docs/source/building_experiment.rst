@@ -90,3 +90,9 @@ After setting the laser to what we need, we have to prepare our acquisition card
         }
 
 Remember that in this experiment, the ADQ is triggered by a signal coming from the laser. Therefore we can be sure of the number of points we are going to acquire per scan. The accuracy is just how much time there is between points. If the scan speed is constant, the time between acquisition points is given by distance/speed. In the case of triggering the digitalization from an external source, according to NI this parameter is not crucial but should be there anyhow.
+
+.. automodule:: experimentor.experiment.base_experiment
+   :members:
+
+.. autoclass:: experimentor.experiment.base_experiment.Experiment
+   :members:

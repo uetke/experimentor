@@ -24,5 +24,7 @@ And later on, from a different file, lets say start.py::
    Config.param_a = 2
    use_config()
 
-.. autoclass:: experimentor.config.config.config
+.. automodule:: experimentor.config.config
+
+.. autoclass:: experimentor.config.config.Config
     :members:

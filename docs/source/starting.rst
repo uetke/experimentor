@@ -117,7 +117,7 @@ The second block is where we actually define what scan we want to do::
          - Photodiode Test
          - Photodiode 2
 
-The first key, `laser` establishes what device we are going to scan. The name here, as you may have guessed, is the name we gave to the device when we defined it in `devices.yml`. The block of `parmas` sets all the parameters we need to make a scan, i.e., the starting wavelength, the stop wavelength, etc. At this moment I won't enter into the details of the chosen names, but they are closely related to properties in the driver of the laser.
+The first key, `laser` establishes what device we are going to scan. The name here, as you may have guessed, is the name we gave to the device when we defined it in `devices.yml`. The block of `params` sets all the parameters we need to make a scan, i.e., the starting wavelength, the stop wavelength, etc. At this moment I won't enter into the details of the chosen names, but they are closely related to properties in the driver of the laser.
 
 Finally, the `detectors` block determines what detectors are going to be monitored while the laser is scanning. They are nested according to the device to which they are plugged to.
 
@@ -134,3 +134,21 @@ Finally, we have to do something when the experiment finishes, in our case we on
 The overall structure of the yaml file may look a bit more involved than needed by simple experiments; for example we explicitly state which laser we use, while we could have hard coded this (there is only one laser plugged into the experiment). However keeping a more flexible approach enables users to re utilize code more easily. Scanning a laser today may be scanning a stepper motor tomorrow.
 
 Now that we have all the foundations to perform our experiment, is time to start feeding the information to different python classes.
+
+.. automodule:: experimentor.lib.device
+   :members:
+
+.. autoclass:: experimentor.lib.device.Device
+   :members:
+
+.. automodule:: experimentor.lib.actuator
+   :members:
+
+.. autoclass:: experimentor.lib.actuator.Actuator
+   :members:
+
+.. automodule:: experimentor.lib.sensor
+   :members:
+
+.. autoclass:: experimentor.lib.sensor.Sensor
+   :members:

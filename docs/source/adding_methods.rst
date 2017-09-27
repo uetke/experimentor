@@ -115,3 +115,9 @@ interleaved according to the acquisition order (remember that most NI cards have
 
 With this we have covered the basic ideas behind building your own experiment class to perform a custom-made experimen.
 Of course there are many details that were left out and that have to be understood separately.
+
+.. automodule:: experimentor.models.daq.ni6251
+   :members:
+
+.. autoclass:: experimentor.models.daq.ni6251.NI
+   :members:

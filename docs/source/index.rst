@@ -25,3 +25,4 @@ If you need further assistance with the installation of the code, please check :
    building_experiment
    starting_class
    adding_methods
+   the_config

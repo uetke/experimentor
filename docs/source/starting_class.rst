@@ -34,3 +34,6 @@ It is important to note here that we are already acessing a property of the clas
 The last line of the previous block of code initializes the devices. By looking at the :code:`Device` class, one can see that the initialization is done based on the connection type, and assuming that the device is a *Lantz* driver. If one wishes to add devices that need different parameters to be passed as arguments, or that are based in different technologies (for example at the time of writing TCP/IP devices were not yet implemented), those lines of code are the place to modify.
 
 Now we have our class with devices, sensors and actuators. It is time to start adding different features to it in order to make a measurement.
+
+.. automodule:: experimentor.lib.general_functions
+   :members:
