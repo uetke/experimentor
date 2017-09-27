@@ -23,3 +23,6 @@ And later on, from a different file, lets say start.py::
    from module import use_config
    Config.param_a = 2
    use_config()
+
+.. autoclass:: experimentor.config.config.config
+    :members:
