@@ -23,3 +23,5 @@ If you need further assistance with the installation of the code, please check :
    installing
    starting
    building_experiment
+   starting_class
+   adding_methods

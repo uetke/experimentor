@@ -55,7 +55,7 @@ No field is required a priory, but giving a name is highly recommended. All the 
          max: 10um
        default: 5um
 
-Note that the first key is the device to which the actuator is plugged. If defining actuators or sensors in the same file, they should be nested according to the device to which they are plugged. The first key afterwards is the name of the device and should be unique; if not, it will be overriden by the latest sensor/actuator loaded. The two more important pieces of information are the calibration and limits. The first explains the program how to convert from volts (the natural units of any ADQ) to the units of the actuator/sensor. The latter is for safety purposes and to maximize the convertion resolution of the DAQ that support setting variable gains.
+Note that the first key is the device to which the actuator is plugged. If defining actuators or sensors in the same file, they should be nested according to the device to which they are plugged. The first key afterwards is the name of the device and should be unique; if not, it will be overridden by the latest sensor/actuator loaded. The two more important pieces of information are the calibration and limits. The first explains the program how to convert from volts (the natural units of any ADQ) to the units of the actuator/sensor. The latter is for safety purposes and to maximize the convertion resolution of the DAQ that support setting variable gains.
 
 None of the keys specified here are mandatory, but common sense dictates that the ones shown in the example are the minimum required ones for an experiment.
 
@@ -133,4 +133,4 @@ Finally, we have to do something when the experiment finishes, in our case we on
 
 The overall structure of the yaml file may look a bit more involved than needed by simple experiments; for example we explicitly state which laser we use, while we could have hard coded this (there is only one laser plugged into the experiment). However keeping a more flexible approach enables users to re utilize code more easily. Scanning a laser today may be scanning a stepper motor tomorrow.
 
-Now that we have all the foundations to perform our experiment, is time to start feeding the information to different python packages.
+Now that we have all the foundations to perform our experiment, is time to start feeding the information to different python classes.
