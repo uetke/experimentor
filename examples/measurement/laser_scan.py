@@ -53,7 +53,7 @@ class LaserScan(Experiment):
         self.initialize_devices()
         self.daqs = {}  # Pace to store the DAQ devices that will be acquiring data
 
-        def setup_scan(self):
+    def setup_scan(self):
         """ Prepares the scan by setting all the parameters to the DAQs and laser.
 
         .. warning:: ALL THIS IS WORK IN PROGRESS, THAT WORKS WITH VERY SPECIFIC SETUP CONDITIONS!

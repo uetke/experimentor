@@ -117,8 +117,9 @@ class Device:
                     except:
                         logger.warning('Value {} could not be converted to Quantity'.format(values[k]))
                         value = values[k]
-
-                logger.info('Setting {} to {:~}'.format(k, value))
+                else:
+                    value = values[k]
+                logger.info('Setting {} to {:}'.format(k, value))
                 try:
                     setattr(self.driver, k, values[k])
                 except:

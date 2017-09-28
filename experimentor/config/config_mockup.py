@@ -22,14 +22,13 @@ inherited by the rest of the code.
     the Experimentor happens.
 
 """
-import PyDAQmx as nidaq
 
 
-class Config(object):
+class ConfigMockup(object):
     # Settings specific to the national instruments card. Not all experiments will need this block.
     ni_buffer = 50000  # When acquiring in continuous mode, how big is the buffer.
-    ni_measure_mode = nidaq.DAQmx_Val_Diff
-    ni_trigger_edge = nidaq.DAQmx_Val_Rising
+    ni_measure_mode = 0
+    ni_trigger_edge = 0
     ni_read_timeout = 0
 
     class Laser:
@@ -49,7 +48,7 @@ class Config(object):
                 freq = 1/1000  # kHz, in order to do an average of 10 measurements in 10ms.
                 num_points = 10
                 trigger = ""  # Internal trigger
-                trigger_edge = nidaq.DAQmx_Val_Rising
-                measure_mode = nidaq.DAQmx_Val_Diff
-                cont_finite = nidaq.DAQmx_Val_FiniteSamps
+                trigger_edge = 0
+                measure_mode = 1
+                cont_finite = 0
                 read_timeout = 0

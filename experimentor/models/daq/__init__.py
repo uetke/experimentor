@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-from .ni6251 import NI
+# from .ni6251 import NI
