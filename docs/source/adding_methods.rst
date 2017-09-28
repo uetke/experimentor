@@ -105,7 +105,7 @@ For reading the ADQ we need to follow steps similar than the ones for setting it
    dev = self.devices[device]['dev']
    daq_driver = dev.driver
    num_sensors = len(self.scan['detectors'][device])
-   vv, dd = daq_driver.driver.read_analog(self.scan_task, conditions)
+   vv, dd = daq_driver.read_analog(self.scan_task, conditions)
    dd = dd[:vv*num_sensors]
    dd = np.reshape(dd, (num_sensors, int(vv)))
 
