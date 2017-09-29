@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
     UUTrack.Model.Cameras._skeleton.py
     ==================================

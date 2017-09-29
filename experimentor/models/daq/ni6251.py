@@ -1,126 +1,51 @@
 # -*- coding: utf-8 -*-
 """
-    ni6251.py
-    ---------
-    Class for comunicating with the NI-6251 DAQ. It requires to have installed the DAQmx (provided by NI) and the
-    pyDAQmx package (from pypy). It does not check for dependencies automatically, so it is up to the user to have them.
-    This model is far from complete; the place to start is the
-    `DAQmx C Reference <http://zone.ni.com/reference/en-XX/help/370471AA-01/>`_
+    NI model class
+    ==============
+    **National Instruments model for acquiring and generating signals.**
 
-     .. sectionauthor:: Aquiles Carattino <aquiles@uetke.com>
+    .. warning:: This model relies on the PyDAQmx package.
+
+    This class defines several methods that are useful when dealing with experiments. For example, when acquiring an
+    analog signal, the method `analog_input_setup` takes within its arguments a list of `Devices` and it takes care of
+    checking their limits, connection port, etc.
+
+    If you are planning to add something to your experiment that the NI class does not support yet, the best is to look
+    at the documentation **NI-DAQmx C Reference Help** (http://zone.ni.com/reference/en-XX/help/370471AA-01/). PyDAQmx
+    wrapped all the C functions, removing the initial 'DAQmx' from the name, and the task handle is implicitly defined.
+
+    The logic to add a new function here would be, for example: check if there is already something similar happening,
+    for example if the same type of channel is already covered in the class and try to build from that example. If not, go
+    to the documentation of NI and try to build a quick and simple python script that does what you are expecting. In this
+    way you can be sure you understood what you are supposed to achieve. Then, write methods within this class that allow
+    you to setup and trigger the new task. Sometimes the splitting between setting up and triggering is useful, since it
+    allow you to trigger several times the same task without redefining it.
+
+    Bear in mind that you will have access to specific information from outside the NI class. For example you can pass
+    devices as arguments, and they will carry all the information you set up in the YAML file. If what you need is not
+    yet covered, go back to the YAML and add it, then continue editing the NI class. Remember that adding is easy, removing
+    or renaming implies that you have to check all the downstream code, and being YML the first step, it will imply reviewing
+    everything.
+
+
+    .. sectionauthor:: Aquiles Carattino <aquiles@uetke.com>
 """
-import logging
-import time
-
 import PyDAQmx as nidaq
 import numpy as np
-
-from experimentor import Q_
-from ._skeleton import Daq
-from ...config import Config
-from ...lib.general_functions import from_units_to_volts, from_volts_to_units
-logger = logging.getLogger(__name__)
+from pharos.config import config
+from pharos.model.daq._skeleton import DaqBase
+from lantz import Q_
 
 
-class NI(Daq):
-    model = "6251"
+class NI(DaqBase):
     def __init__(self, daq_num=1):
         """Class trap for condensing tasks that can be used for interacting with an optical trap.
         session -- class with important variables, including the adq card.
         """
-        super().__init__()
         self.daq_num = daq_num
         self.monitorNum = []
         self.tasks = []
         self.nidaq = nidaq
-        self.logger = logging.getLogger(__name__)
-        self.logger.info('Started NI instrument with number: {}'.format(daq_num))
-
-    def apply_value(self, actuator, value):
-        """ Sets the output of the NI card. For the time being it sets a DC constant value; this has to be expanded to
-        other types of actuators, for example a digital output.
-
-        .. todo:: Make this method work with actuators of different types than analog
-
-        .. warning:: This method is not intended for making ramps or generating a continuous output; it is just a handy
-        way of changing the value of a particular port.
-
-        :param actuator: specifies the actuator on which to act.
-        :param value: The value to be set
-
-        """
-
-
-        port = actuator.properties['port']
-
-        # First let's check that the actuator is an analog channel
-        if actuator.properties['type'] == 'analog':
-            port = "Dev%s/ao%s" % (self.daq_num, port)
-            calibration = actuator.calibration
-            # Convert value to volts:
-            output_volts = from_units_to_volts(value, calibration)
-
-            min_value = Q_(actuator.properties['limits']['min'])
-            max_value = Q_(actuator.properties['limits']['max'])
-            # Convert values to volts:
-            # The NI card needs to specify min and max voltages; the actuator itself should check that the voltages
-            # are within limits before even arriving here. In any case, as a safe, the NI card will never output a value
-            # beyond the limits.
-
-            min_V = from_units_to_volts(min_value, calibration)
-            max_V = from_units_to_volts(max_value, calibration)
-
-            autostart = nidaq.bool32(True)
-            timeout = Config.NI.Output.Analog.timeout
-            self.logger.debug('Actuator: {}, MIN: {}, MAX: {}, Value: {}'.format(actuator.name, min_V, max_V, output_volts))
-            t = nidaq.Task()
-            t.CreateAOVoltageChan(port, None, min_V, max_V, nidaq.DAQmx_Val_Volts, None)
-            t.WriteAnalogScalarF64(autostart, timeout, output_volts, None)
-            t.StopTask()
-            t.ClearTask()
-
-        self.logger.info('Changed the value of {} to {}'.format(actuator.name, value))
-
-    def read_value(self, sensor):
-        """ Reads the value of a sensor.
-
-        .. todo:: Make this method work with sensors other than analog inputs.
-
-        :param sensor: the sensor to read.
-        :return: The value read, with units if appropriate.
-        """
-        port = sensor.properties['port']
-
-        if sensor.properties['type'] == 'analog':
-            port = "Dev%s/ai%s" % (self.daq_num, port)
-            calibration = sensor.properties['calibration']
-            min_value = Q_(sensor.properties['limits']['min'])
-            max_value = Q_(sensor.properties['limits']['max'])
-            min_V = from_units_to_volts(min_value, calibration)
-            max_V = from_units_to_volts(max_value, calibration)
-
-            freq = Config.NI.Input.Analog.freq
-            trigger = Config.NI.Input.Analog.trigger
-            trigger_edge = Config.NI.Input.Analog.trigger_edge
-            measure_mode = Config.NI.Input.Analog.measure_mode
-            num_points = Config.NI.Input.Analog.num_points
-            cont_finite = Config.NI.Input.Analog.cont_finite
-
-            t = nidaq.Task()
-            t.CreateAIVoltageChan(port, None, measure_mode, min_V,
-                                  max_V, nidaq.DAQmx_Val_Volts, None)
-            t.CfgSampClkTiming(trigger, freq, trigger_edge, cont_finite, num_points)
-            t.StartTask()
-            time.sleep(num_points*freq)
-            timeout = Config.NI.Input.Analog.read_timeout
-            read = nidaq.int32()
-            data = np.zeros((num_points,), dtype=np.float64)
-
-            t.ReadAnalogF64(num_points, timeout, nidaq.DAQmx_Val_GroupByChannel,
-                            data, num_points, nidaq.byref(read), None)
-
-            value = np.mean(data)
-            return from_volts_to_units(value, calibration)
 
     def analog_input_setup(self, conditions):
         """
@@ -129,11 +54,12 @@ class NI(Daq):
 
         """
         t = nidaq.Task()
-        sensors = conditions['sensors']
-        if not isinstance(sensors, list):
-            channel = ["Dev%s/ai%s" % (self.daq_num, sensors.properties['port'])]
-            limit_min = [sensors.properties['limits']['min']]
-            limit_max = [sensors.properties['limits']['max']]
+        dev = 'Dev%s' % self.daq_num
+        devices = conditions['devices']
+        if not isinstance(devices, list):
+            channel = ["Dev%s/ai%s" % (self.daq_num, devices.properties['port'])]
+            limit_min = [devices.properties['limits']['min']]
+            limit_max = [devices.properties['limits']['max']]
         else:
             channel = []
             limit_max = []
@@ -146,10 +72,12 @@ class NI(Daq):
         channels = ', '.join(channel)
         channels.encode('utf-8')
         freq = int(1 / conditions['accuracy'].to('s').magnitude)
-        self.logger.debug('SAMPLES PER SECOND: %s' % freq)
+        # freq = freq.magnitude
+        print('Samples per second: {} Hz'.format(freq))
+
         if conditions['trigger'] == 'external':
             trigger = "/Dev%s/%s" % (self.daq_num, conditions['trigger_source'])
-            self.logger.debug('NI: external trigger: %s' % trigger)
+            print('NI: external trigger: %s' % trigger)
         else:
             trigger = ""
         if 'trigger_edge' in conditions:
@@ -158,12 +86,12 @@ class NI(Daq):
             elif conditions['trigger_edge'] == 'falling':
                 trigger_edge = nidaq.DAQmx_Val_Falling
         else:
-            trigger_edge = Config.NI.Input.Analog.trigger_edge
+            trigger_edge = config.ni_trigger_edge
 
         if 'measure_mode' in conditions:
             measure_mode = conditions['measure_mode']
         else:
-            measure_mode = Config.NI.Input.Analog.measure_mode
+            measure_mode = config.ni_measure_mode
 
         t.CreateAIVoltageChan(channels, None, measure_mode, min(limit_min),
                               max(limit_max), nidaq.DAQmx_Val_Volts, None)
@@ -181,26 +109,23 @@ class NI(Daq):
             num_points = conditions['points']
         else:
             cont_finite = nidaq.DAQmx_Val_ContSamps
-            num_points = Config.ni_buffer
+            num_points = config.ni_buffer
 
+        print('Number of points: {}'.format(num_points))
         t.CfgSampClkTiming(trigger, freq, trigger_edge, cont_finite, num_points)
         self.tasks.append(t)
         return len(self.tasks) - 1
 
     def trigger_analog(self, task=None):
-        """ Trigger the given task for acquiring an analog signal. If none is given, it triggers the last registered
-        task.
-
+        """
         :param task: Task number to be triggered.
+        :return:
         """
         if task is None:
-            task = -1
             t = self.tasks[-1]
-            self.logger.info('Getting last registered task')
         else:
             t = self.tasks[task]
         t.StartTask()  # Starts the measurement.
-        self.logger.info('Starting task number {}'.format(task))
 
     def read_analog(self, task, conditions):
         """Gets the analog values acquired with the triggerAnalog function.
@@ -215,11 +140,11 @@ class NI(Daq):
         points = int(conditions['points'])
         if points > 0:
             data = np.zeros((points,), dtype=np.float64)
-            t.ReadAnalogF64(points, Config.ni_read_timeout, nidaq.DAQmx_Val_GroupByChannel,
+            t.ReadAnalogF64(points, config.ni_read_timeout, nidaq.DAQmx_Val_GroupByChannel,
                             data, points, nidaq.byref(read), None)
         else:
-            data = np.zeros((Config.ni_buffer,), dtype=np.float64)
-            t.ReadAnalogF64(points, Config.ni_read_timeout, nidaq.DAQmx_Val_GroupByChannel,
+            data = np.zeros((config.ni_buffer,), dtype=np.float64)
+            t.ReadAnalogF64(points, config.ni_read_timeout, nidaq.DAQmx_Val_GroupByChannel,
                             data, len(data), nidaq.byref(read), None)
         values = read.value
         return values, data
@@ -227,14 +152,21 @@ class NI(Daq):
     def from_volt_to_units(self, value, dev):
         pass
 
-    def from_units_to_volts(self, value, dev):
-        """ Converts a value from specific actuator units into volts to pass to a DAQ.
-
-        :param value: The output value
-        :param dev: The calibration of the device, including units.
-        :type value: Quantity
-        :type dev: dict.
+    def digital_output(self, port, status):
+        """ Sets the port of the digital_output to status (either True or False)
         """
+        t = nidaq.Task()
+        channel = "Dev%s/%s" % (self.daq_num, port)
+        t.CreateDOChan(channel, None, nidaq.DAQmx_Val_ChanPerLine)
+
+        if status:
+            status = -1  # With this value, the digital output is set to High
+        else:
+            status = 0
+        print('Status: {}'.format(status))
+        t.WriteDigitalScalarU32(nidaq.bool32(True), 0, status, None)
+
+    def from_units_to_volts(self, value, dev):
         units = Q_(dev.properties['calibration']['units'])
         slope = dev.properties['calibration']['slope'] * units
         offset = dev.properties['calibration']['offset'] * units
@@ -284,7 +216,7 @@ class NI(Daq):
         freq = int(1 / conditions['accuracy'].to('s').magnitude)
         num_points = len(conditions['data'])
 
-        t.CfgSampClkTiming('', freq, Config.ni_trigger_edge, nidaq.DAQmx_Val_FiniteSamps, num_points)
+        t.CfgSampClkTiming('', freq, config.ni_trigger_edge, nidaq.DAQmx_Val_FiniteSamps, num_points)
 
         auto_trigger = nidaq.bool32(0)
         timeout = -1
@@ -296,11 +228,7 @@ class NI(Daq):
         self.tasks.append(t)
         return len(self.tasks) - 1
 
-    def is_task_complete(self, task=None):
-        """ Returns true if the given task is complete. If no given task, then the last registered task."""
-        if task is None:
-            task = -1
-
+    def is_task_complete(self, task):
         t = self.tasks[task]
         d = nidaq.bool32()
         t.GetTaskComplete(d)
@@ -316,3 +244,12 @@ class NI(Daq):
 
     def reset_device(self):
         nidaq.DAQmxResetDevice('Dev%s' % self.daq_num)
+
+
+if __name__ == '__main__':
+    a = NI(2)
+    status = True
+    while True:
+        status = not status
+        a.digital_output('PFI1', status)
+        input()

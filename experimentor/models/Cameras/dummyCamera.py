@@ -1,4 +1,5 @@
-""" 
+# -*- coding: utf-8 -*-
+"""
     UUTrack.Model.Cameras.dummyCamera.py
     ====================================
     Dummy camera class for testing GUI and other functionalities. Based on the skeleton.

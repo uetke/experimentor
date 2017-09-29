@@ -22,6 +22,7 @@
     .. todo:: data is read but not stored within the class; maybe it should be better to have it built-in
     .. todo:: There is no method for saving; it was introduced in the GUI. Maibe it would make it a bit more robust.
 
+    .. sectionauthor:: Aquiles Carattino <aquiles@uetke.com>
 """
 import numpy as np
 import logging
@@ -52,6 +53,19 @@ class LaserScan(Experiment):
         self.load_actuators(actuators)
         self.initialize_devices()
         self.daqs = {}  # Pace to store the DAQ devices that will be acquiring data
+
+    def sync_shutter(self):
+        """ Opens and closes the shutter to be sure the digout high means shutter open.
+
+        .. codeauthor:: Karindra Perrier
+        """
+        shutter = self.scan['shutter']
+        ni_daq = self.devices['NI-DAQ']
+        ni_daq.driver.digital_output(shutter['port'], False)
+        sleep(0.2)
+        ni_daq.driver.digital_output(shutter['port'], True)
+        sleep(0.2)
+        ni_daq.driver.digital_output(shutter['port'], False)
 
     def setup_scan(self):
         """ Prepares the scan by setting all the parameters to the DAQs and laser.
@@ -224,7 +238,7 @@ class LaserScan(Experiment):
             sensors = []
             if dev.properties['model'] != 'ni':
                 self.logger.warning('Only NI Cards are supported at the moment.')
-                raise Warning('Onli NI cards are supported at the moment.')
+                raise Warning('Only NI cards are supported at the moment.')
             self.daqs[device]['dev'] = dev
             self.logger.debug('NI card devices')
             sens_to_monitor = monitor['detectors'][device]

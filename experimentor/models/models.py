@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 MODELS
 ======
@@ -7,6 +8,7 @@ Models can also take care of manipulating data, for example calculating an FFT a
 
 """
 from experimentor.lib import Actuator, Sensor
+
 
 class Model(object):
     """
